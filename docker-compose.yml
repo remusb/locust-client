@@ -4,24 +4,28 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: --cloudwatch --host=https://httpbin.org
     env_file:
       - .env
     environment:
       - LOCUST_MODE=master
+      - TARGET_URL=https://httpbin.org
+      - LOCUSTFILE_URL=https://client-locusts.s3.eu-central-1.amazonaws.com/locustfile.py
+      - LOCUST_OPTS=--cloudwatch
     ports:
       - 8080:8089
   locust-worker:
     build:
       context: .
       dockerfile: Dockerfile
-    command: --cloudwatch --host=https://httpbin.org
     env_file:
       - .env
     environment:
-      - LOCUST_MODE=worker
-      - LOCUST_MASTER=server
+      - LOCUST_MODE=slave
+      - LOCUST_MASTER_HOST=server
       - LOCUST_MASTER_PORT=5557
       - LOCUST_MASTER_WEB=8089
+      - TARGET_URL=https://httpbin.org
+      - LOCUSTFILE_URL=https://client-locusts.s3.eu-central-1.amazonaws.com/locustfile.py
+      - LOCUST_OPTS=--cloudwatch
     links:
       - "locust-master:server"
