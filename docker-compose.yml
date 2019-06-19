@@ -1,0 +1,27 @@
+version: '2.1'
+services:
+  locust-master:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: --cloudwatch --host=https://httpbin.org
+    env_file:
+      - .env
+    environment:
+      - LOCUST_MODE=master
+    ports:
+      - 8080:8089
+  locust-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: --cloudwatch --host=https://httpbin.org
+    env_file:
+      - .env
+    environment:
+      - LOCUST_MODE=worker
+      - LOCUST_MASTER=server
+      - LOCUST_MASTER_PORT=5557
+      - LOCUST_MASTER_WEB=8089
+    links:
+      - "locust-master:server"
